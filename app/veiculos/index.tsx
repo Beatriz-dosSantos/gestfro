@@ -1,5 +1,4 @@
-// app/veiculos/index.tsx
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -12,15 +11,21 @@ import { useRouter } from 'expo-router';
 import { listarVeiculos } from '@/services/veiculos';
 import { Veiculo } from '@/types/veiculo';
 
-export default function VeiculosIndex() {
+export default function ListaVeiculos() {
   const [veiculos, setVeiculos] = useState<Veiculo[]>([]);
   const router = useRouter();
 
   useEffect(() => {
     listarVeiculos()
       .then(setVeiculos)
-      .catch(() => Alert.alert('Erro', 'Erro ao carregar veículos'));
+      .catch(() => {
+        Alert.alert('Erro', 'Não foi possível carregar os veículos.');
+      });
   }, []);
+
+  const handleEditar = (id: string) => {
+  router.push(`/veiculos/editar/${id}` as const);
+};
 
   return (
     <View style={styles.container}>
@@ -32,21 +37,18 @@ export default function VeiculosIndex() {
         contentContainerStyle={{ paddingBottom: 40 }}
         renderItem={({ item }) => (
           <View style={styles.item}>
-            <Text style={styles.itemTexto}>{item.modelo}</Text>
-            <Text style={styles.itemSubtexto}>Placa: {item.placa}</Text>
-            <Text style={styles.itemSubtexto}>
-              Status: {item.ativo ? 'Ativo' : 'Inativo'}
-            </Text>
+            <Text style={styles.texto}>Modelo: {item.modelo}</Text>
+            <Text style={styles.texto}>Placa: {item.placa}</Text>
+
+            <TouchableOpacity
+              style={styles.botao}
+              onPress={() => handleEditar(item.id)}
+            >
+              <Text style={styles.botaoTexto}>Editar</Text>
+            </TouchableOpacity>
           </View>
         )}
       />
-
-      <TouchableOpacity
-        style={styles.botao}
-        onPress={() => router.push('/veiculos/novo')}
-      >
-        <Text style={styles.botaoTexto}>Novo Veículo</Text>
-      </TouchableOpacity>
     </View>
   );
 }
@@ -54,42 +56,34 @@ export default function VeiculosIndex() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#2C3E45',
-    padding: 20,
+    padding: 16,
+    backgroundColor: '#fff',
   },
   titulo: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#CBD5C0',
-    textAlign: 'center',
-    marginBottom: 20,
+    marginBottom: 16,
   },
   item: {
-    backgroundColor: '#648B7C',
-    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#ccc',
     padding: 12,
-    marginBottom: 14,
+    borderRadius: 8,
+    marginBottom: 12,
   },
-  itemTexto: {
+  texto: {
     fontSize: 16,
-    fontWeight: 'bold',
-    color: '#fff',
-  },
-  itemSubtexto: {
-    fontSize: 14,
-    color: '#fff',
-    marginTop: 4,
+    marginBottom: 4,
   },
   botao: {
-    backgroundColor: '#648B7C',
-    paddingVertical: 14,
-    borderRadius: 10,
+    marginTop: 8,
+    backgroundColor: '#3498db',
+    padding: 8,
+    borderRadius: 6,
     alignItems: 'center',
-    marginTop: 12,
   },
   botaoTexto: {
     color: '#fff',
     fontWeight: 'bold',
-    fontSize: 16,
   },
 });
